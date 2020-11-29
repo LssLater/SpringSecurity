@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="fragments/head">
+</head>
+<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed ">
+<!-- Site wrapper -->
+<div class="wrapper">
+  <!-- 头部区域-->
+  <th:block th:replace="fragments/main-header"/>
+  <!-- 左侧区域-->
+  <th:block th:replace="fragments/main-sidebar"/>
+  <!-- 右侧主区域-->
+  <div class="content-wrapper">
+    <img th:src="@{/modules/img/index.jpg}" src="../modules/img/index.jpg" width="100%" height="100%">
+  </div>
+  <!-- 右底部区域-->
+  <th:block th:replace="fragments/main-footer"/>
+  <!-- 右上角工具栏-->
+  <th:block th:replace="fragments/control-sidebar"/>
+</div>
+
+<!-- JS公共代码-->
+<th:block th:replace="fragments/script"/>1
+</body>
+</html>
