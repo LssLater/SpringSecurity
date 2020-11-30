@@ -3,6 +3,7 @@ package com.yu.security.authentication;
 import com.yu.base.result.MengxueguResult;
 import com.yu.security.properties.LoginResponseType;
 import com.yu.security.properties.SecurityProperties;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
@@ -36,7 +37,12 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
             response.setContentType("application/json;charset=UTF-8");
             response.getWriter().write(result.toJsonString());
         }else {
-            super.setDefaultFailureUrl(securityProperties.getAuthentication().getLoginPage()+"?error");
+
+            String referer = request.getHeader("Referer");
+            String lastUrl = StringUtils.substringBefore(referer, "?");
+
+
+            super.setDefaultFailureUrl(lastUrl+"?error");
             super.onAuthenticationFailure(request, response, exception);
         }
     }

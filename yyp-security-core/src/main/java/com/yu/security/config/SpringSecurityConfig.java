@@ -1,5 +1,8 @@
 package com.yu.security.config;
 
+import com.yu.security.authentication.code.ImageCodeValidateFilter;
+import com.yu.security.authentication.mobile.MobileAuthenticationConfig;
+import com.yu.security.authentication.mobile.MobileValidateFilter;
 import com.yu.security.properties.SecurityProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +19,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+
+import javax.sql.DataSource;
 
 /**
  * @Author: yy
@@ -39,7 +46,30 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private AuthenticationFailureHandler customAuthenticationFailureHandler;
 
+    @Autowired
+    ImageCodeValidateFilter imageCodeValidateFilter;
+
     Logger logger = LoggerFactory.getLogger(getClass());
+
+    /**
+     * 记住我功能
+     */
+    @Autowired
+    DataSource dataSource;
+
+    @Autowired
+    private MobileValidateFilter mobileValidateFilter;
+
+    @Autowired
+    private MobileAuthenticationConfig mobileAuthenticationConfig;
+    @Bean
+    public JdbcTokenRepositoryImpl jdbcTokenRepository(){
+        JdbcTokenRepositoryImpl jdbcTokenRepository = new JdbcTokenRepositoryImpl();
+        jdbcTokenRepository.setDataSource(dataSource);
+        // 是否启动时自动创建表，第一次启动时开启即可，以后再启动需要将其注释，否则会报错
+        // jdbcTokenRepository.setCreateTableOnStartup(true);
+        return jdbcTokenRepository;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder(){
@@ -75,7 +105,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.formLogin()// 表单认证
+        http.addFilterBefore(mobileValidateFilter,UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(imageCodeValidateFilter, UsernamePasswordAuthenticationFilter.class)
+                .formLogin()// 表单认证
 //                .loginPage("/login/page") // 登陆页面
 //                .loginProcessingUrl("/login/form") // 登陆表单提交处理URL 默认时/login
 //                .usernameParameter("name")
@@ -89,8 +121,14 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests() // 认证请求
                 //.antMatchers("/login/page").permitAll() // 放行跳转认证请求
-                .antMatchers(securityProperties.getAuthentication().getLoginPage()).permitAll()
-                .anyRequest().authenticated(); // 所有进入应用的HTTP请求都要进行认证
+                .antMatchers(securityProperties.getAuthentication().getLoginPage(),"/code/image","/mobile/page","/code/mobile").permitAll()
+                .anyRequest().authenticated() // 所有进入应用的HTTP请求都要进行认证
+                .and()
+                .rememberMe()
+                .tokenRepository(jdbcTokenRepository()) // 保存登录信息
+                .tokenValiditySeconds(60*60*24*7);
+
+        http.apply(mobileAuthenticationConfig);
     }
 
     /**
