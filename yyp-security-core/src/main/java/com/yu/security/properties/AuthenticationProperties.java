@@ -1,10 +1,13 @@
 package com.yu.security.properties;
 
+import lombok.Data;
+
 /**
  * @Author: yy
  * @Date: 2020/11/29 19:41
  * @Version: 1.0.0
  */
+@Data
 public class AuthenticationProperties {
     // 如果application.yml中没有配置相关属性、将会使用以下默认值
     private String loginPage = "/login/page";
@@ -15,51 +18,12 @@ public class AuthenticationProperties {
 
     private LoginResponseType loginType = LoginResponseType.REDIRECT;
 
-    public LoginResponseType getLoginType() {
-        return loginType;
-    }
+    private String imageCodeUrl = "/code/image";
 
-    public void setLoginType(LoginResponseType loginType) {
-        this.loginType = loginType;
-    }
+    private String mobileCodeUrl = "/code/mobile";
 
-    public String getLoginPage() {
-        return loginPage;
-    }
+    private String mobilePage = "/mobile/page";
 
-    public void setLoginPage(String loginPage) {
-        this.loginPage = loginPage;
-    }
+    private Integer tokenValiditySeconds = 60*60*24*7;
 
-    public String getLoginProcessingUrl() {
-        return loginProcessingUrl;
-    }
-
-    public void setLoginProcessingUrl(String loginProcessingUrl) {
-        this.loginProcessingUrl = loginProcessingUrl;
-    }
-
-    public String getUsernameParameter() {
-        return usernameParameter;
-    }
-
-    public void setUsernameParameter(String usernameParameter) {
-        this.usernameParameter = usernameParameter;
-    }
-
-    public String getPasswordParameter() {
-        return passwordParameter;
-    }
-
-    public void setPasswordParameter(String passwordParameter) {
-        this.passwordParameter = passwordParameter;
-    }
-
-    public String[] getStaticPaths() {
-        return staticPaths;
-    }
-
-    public void setStaticPaths(String[] staticPaths) {
-        this.staticPaths = staticPaths;
-    }
 }

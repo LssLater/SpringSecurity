@@ -23,3 +23,7 @@ yyp:
         - /modules/**
         - /plugins/**
       loginType: REDIRECT
+      imageCodeUrl: /code/image # 图形验证码Url
+      mobileCodeUrl: /code/mobile # 手机验证码Url
+      mobilePage: /mobile/page
+      tokenValiditySeconds: 604800
